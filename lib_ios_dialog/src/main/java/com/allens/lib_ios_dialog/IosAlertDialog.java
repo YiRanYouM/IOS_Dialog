@@ -24,10 +24,6 @@ public class IosAlertDialog {
     private LinearLayout lLayout_bg;
     private Display display;
 
-    private Button btn_neg;
-    private Button btn_pos;
-    private ImageView img_line;
-
     /**
      * dialog  宽度
      */
@@ -45,12 +41,6 @@ public class IosAlertDialog {
         lLayout_bg = (LinearLayout) view.findViewById(R.id.lLayout_bg);
 
 
-        btn_neg = (Button) view.findViewById(R.id.btn_neg);
-        btn_neg.setVisibility(View.GONE);
-        btn_pos = (Button) view.findViewById(R.id.btn_pos);
-        btn_pos.setVisibility(View.GONE);
-        img_line = (ImageView) view.findViewById(R.id.img_line);
-        img_line.setVisibility(View.GONE);
 
         dialog = new Dialog(context, R.style.AlertDialogStyle);
         dialog.setContentView(view);
