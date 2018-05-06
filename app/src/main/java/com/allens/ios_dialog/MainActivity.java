@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.allens.lib_ios_dialog.IosAlertDialog;
 import com.allens.lib_ios_dialog.IosDialog;
 import com.allens.lib_ios_dialog.IosSheetDialog;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -82,8 +84,32 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btn_4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new IosAlertDialog(MainActivity.this)
+                new IosDialog(MainActivity.this)
                         .builder()
+                        .addEdit("1")
+                        .setEditHint("1","123")
+                        .addEdit("2")
+                        .setEditHint("2","345")
+                        .setCancelable(true)
+                        .setCancelOutside(true)
+                        .setTitle("标题")
+                        .setMsg("内容")
+                        .setDialogWidth(0.9f)
+
+                        .setPositiveButton(new IosDialog.OnEdPositiveListener() {
+                            @Override
+                            public void onClick(View view, HashMap<String, String> msgMap) {
+                                Toast.makeText(MainActivity.this, "msg: " + msgMap.toString(), Toast.LENGTH_SHORT).show();
+                            }
+
+                        })
+                        .setNegativeButton("取消", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Toast.makeText(MainActivity.this, "取消", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+
                         .show();
             }
         });

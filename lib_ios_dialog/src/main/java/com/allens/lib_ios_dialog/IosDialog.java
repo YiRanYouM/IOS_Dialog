@@ -2,6 +2,7 @@ package com.allens.lib_ios_dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -9,11 +10,18 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author allens
@@ -22,12 +30,19 @@ public class IosDialog {
     private Context context;
     private Dialog dialog;
     private LinearLayout lLayout_bg;
+    private LinearLayout lLayout_alert_ll;
     private TextView txt_title;
     private TextView txt_msg;
     private Button btn_neg;
     private Button btn_pos;
     private ImageView img_line;
     private Display display;
+
+
+    /***
+     * 用于添加view
+     */
+    private Map<String, View> viewHap;
 
     /**
      * 是否显示title
@@ -62,8 +77,9 @@ public class IosDialog {
 
     public IosDialog builder() {
         View view = LayoutInflater.from(context).inflate(R.layout.view_dialog, null);
-
         lLayout_bg = (LinearLayout) view.findViewById(R.id.lLayout_bg);
+        lLayout_alert_ll = (LinearLayout) view.findViewById(R.id.lLayout_alert_ll);
+        lLayout_alert_ll.setVerticalGravity(View.GONE);
         txt_title = (TextView) view.findViewById(R.id.txt_title);
         txt_title.setVisibility(View.GONE);
         txt_msg = (TextView) view.findViewById(R.id.txt_msg);
@@ -79,9 +95,9 @@ public class IosDialog {
         dialog.setContentView(view);
 
         lLayout_bg.setLayoutParams(new FrameLayout.LayoutParams((int) (display.getWidth() * dialogWidth), LayoutParams.WRAP_CONTENT));
-
         return this;
     }
+
 
     public IosDialog setTitle(@NonNull String title) {
         showTitle = true;
@@ -93,6 +109,58 @@ public class IosDialog {
         showMsg = true;
         txt_msg.setText(msg);
         return this;
+    }
+
+
+    public IosDialog addEdit(String tag) {
+        if (viewHap == null) {
+            viewHap = new HashMap<>();
+        }
+        viewHap.put(tag, getEt());
+        return this;
+    }
+
+
+    public IosDialog addImage() {
+        if (viewHap == null) {
+            viewHap = new HashMap<>();
+        }
+
+        return this;
+    }
+
+
+    /***
+     * 设置对应edit  的hint
+     * @param tag
+     * @param hint
+     */
+    public IosDialog setEditHint(String tag, String hint) {
+        if (viewHap != null) {
+            View view = viewHap.get(tag);
+            if (view != null) {
+                ((EditText) view).setHint(hint);
+            }
+        } else {
+            Throwable throwable = new Throwable("没有可以set 的 EditText");
+            throwable.printStackTrace();
+        }
+        return this;
+    }
+
+    private EditText getEt() {
+        LinearLayout linearLayout = getlLayout_alert_ll();
+        EditText editText = new EditText(context);
+        editText.setHint("请输入名称");
+        editText.setBackgroundResource(R.drawable.et_bg);
+        editText.setTextColor(Color.BLACK);
+        editText.setTextSize(14);
+        editText.setPadding(dp2px(4), dp2px(4), dp2px(4), dp2px(4));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(dp2px(15), dp2px(15), dp2px(15), 0);
+        editText.setLayoutParams(lp);
+        linearLayout.addView(editText);
+        return editText;
     }
 
     /***
@@ -140,6 +208,51 @@ public class IosDialog {
     public IosDialog setPositiveButton(final OnClickListener listener) {
         setPositiveButton("确定", listener);
         return this;
+    }
+
+    public IosDialog setPositiveButton(final OnEdPositiveListener listener) {
+        setPositiveButton("确定", listener);
+        return this;
+    }
+
+
+    public IosDialog setPositiveButton(String text, final OnEdPositiveListener listener) {
+        showPosBtn = true;
+        btn_pos.setText(text);
+        btn_pos.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (viewHap == null) {
+                    dialog.dismiss();
+                    Throwable throwable = new Throwable("当前没有可用的EditText 请使用 OnClickListener 的接口");
+                    throwable.printStackTrace();
+                    return;
+                }
+                HashMap<String, String> strings = new HashMap<>();
+                for (Map.Entry<String, View> entry : viewHap.entrySet()) {
+                    String key = entry.getKey();
+                    EditText editText = (EditText) entry.getValue();
+                    String msg = editText.getText().toString();
+                    strings.put(key, msg);
+                }
+                listener.onClick(v, strings);
+
+            }
+        });
+
+        return this;
+    }
+
+    /***
+     * 点击确定
+     */
+    public interface OnEdPositiveListener {
+        /***
+         * 确定
+         * @param view
+         * @param msgMap
+         */
+        void onClick(View view, HashMap<String, String> msgMap);
     }
 
     /***
@@ -271,6 +384,48 @@ public class IosDialog {
         return btn_neg;
     }
 
+    /***
+     * 获取用于添加自定义控件的ll
+     * @return
+     */
+    public LinearLayout getlLayout_alert_ll() {
+        return lLayout_alert_ll;
+    }
+
+
+    /***
+     * 根据手机的分辨率从 dip 的单位 转成为 px(像素)
+     * @param dpValue
+     * @return
+     */
+    public int dp2px(float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+
+    /**
+     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+     */
+    public int px2dip(float pxValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (pxValue / scale + 0.5f);
+    }
+
+    /**
+     * 将px值转换为sp值，保证文字大小不变
+     */
+    public int px2sp(float pxValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (pxValue / fontScale + 0.5f);
+    }
+
+    /**
+     * 将sp值转换为px值，保证文字大小不变
+     */
+    public int sp2px(float spValue) {
+        final float fontScale = context.getResources().getDisplayMetrics().scaledDensity;
+        return (int) (spValue * fontScale + 0.5f);
+    }
 
     /**
      * 获取取消按钮
