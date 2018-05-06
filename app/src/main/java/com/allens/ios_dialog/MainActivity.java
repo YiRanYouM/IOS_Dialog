@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
                         .setTitle("标题")
                         .setMsg("内容")
                         .setDialogWidth(0.9f)
-
                         .setPositiveButton(new IosDialog.OnEdPositiveListener() {
                             @Override
                             public void onClick(View view, HashMap<String, String> msgMap) {
