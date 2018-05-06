@@ -120,16 +120,6 @@ public class IosDialog {
         return this;
     }
 
-
-    public IosDialog addImage() {
-        if (viewHap == null) {
-            viewHap = new HashMap<>();
-        }
-
-        return this;
-    }
-
-
     /***
      * 设置对应edit  的hint
      * @param tag
