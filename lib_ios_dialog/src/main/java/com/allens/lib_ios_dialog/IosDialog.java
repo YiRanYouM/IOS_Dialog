@@ -136,14 +136,90 @@ public class IosDialog {
      * @param hint
      */
     public IosDialog setEditHint(String tag, String hint) {
+        EditText editText = getEditText(tag);
+        if (editText != null) {
+            editText.setHint(hint);
+        }
+        return this;
+    }
+
+    private EditText getEditText(String tag) {
         if (viewHap != null) {
             View view = viewHap.get(tag);
             if (view != null) {
-                ((EditText) view).setHint(hint);
+                try {
+                    return ((EditText) view);
+                } catch (Exception e) {
+                    Throwable throwable = new Throwable("当前tag 对应的View 不是 EditText");
+                    throwable.printStackTrace();
+                }
+            } else {
+                Throwable throwable = new Throwable("当前tag 未找到对应 的 EditText");
+                throwable.printStackTrace();
             }
         } else {
             Throwable throwable = new Throwable("没有可以set 的 EditText");
             throwable.printStackTrace();
+        }
+        return null;
+    }
+
+
+    /***
+     * 设置颜色
+     * @param tag
+     * @param color
+     * @return
+     */
+    public IosDialog setEditTextColor(String tag, int color) {
+        EditText editText = getEditText(tag);
+        if (editText != null) {
+            editText.setTextColor(color);
+        }
+        return this;
+    }
+
+    /***
+     * padding
+     * @param tag
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @return
+     */
+    public IosDialog setEditTextPadding(String tag, float left, float top, float right, float bottom) {
+        EditText editText = getEditText(tag);
+        if (editText != null) {
+            editText.setPadding(dp2px(left), dp2px(top), dp2px(right), dp2px(bottom));
+        }
+        return this;
+    }
+
+    /***
+     * margin
+     * @param tag
+     * @param left
+     * @param top
+     * @param right
+     * @param bottom
+     * @return
+     */
+    public IosDialog setEditTextMargin(String tag, float left, float top, float right, float bottom) {
+        EditText editText = getEditText(tag);
+        if (editText != null) {
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(dp2px(left), dp2px(top), dp2px(right), dp2px(bottom));
+            editText.setLayoutParams(lp);
+        }
+        return this;
+    }
+
+
+    public IosDialog setCursorVisible(String tag, Boolean isShowCursor) {
+        EditText editText = getEditText(tag);
+        if (editText != null) {
+            editText.setCursorVisible(isShowCursor);
         }
         return this;
     }
@@ -155,6 +231,7 @@ public class IosDialog {
         editText.setBackgroundResource(R.drawable.et_bg);
         editText.setTextColor(Color.BLACK);
         editText.setTextSize(14);
+        editText.setCursorVisible(false);
         editText.setPadding(dp2px(4), dp2px(4), dp2px(4), dp2px(4));
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(dp2px(15), dp2px(15), dp2px(15), 0);
@@ -236,7 +313,7 @@ public class IosDialog {
                     strings.put(key, msg);
                 }
                 listener.onClick(v, strings);
-
+                dialog.dismiss();
             }
         });
 
