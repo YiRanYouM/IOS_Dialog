@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                         .setCancelTvSize(16)
                         .setItemTextSize(18)
                         .setItemHeight(45)
-                        .addSheetItem("相册", new IosSheetDialog.OnSheetItemClickListener() {
+                        .addSheetItem("相册",Color.RED, new IosSheetDialog.OnSheetItemClickListener() {
                             @Override
                             public void onClick(int which) {
                                 Toast.makeText(MainActivity.this, which + "", Toast.LENGTH_SHORT).show();

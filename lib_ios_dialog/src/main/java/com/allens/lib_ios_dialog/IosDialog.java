@@ -206,6 +206,12 @@ public class IosDialog {
     }
 
 
+    /***
+     * 是否显示光标
+     * @param tag
+     * @param isShowCursor
+     * @return
+     */
     public IosDialog setCursorVisible(String tag, Boolean isShowCursor) {
         EditText editText = getEditText(tag);
         if (editText != null) {
@@ -402,14 +408,6 @@ public class IosDialog {
         dialog.dismiss();
     }
 
-
-    /***
-     * 获取dialog  宽度
-     * @return
-     */
-    public float getDialogWidth() {
-        return dialogWidth;
-    }
 
     /**
      * 设置dialog  宽度
